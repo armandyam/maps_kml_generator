@@ -50,7 +50,7 @@ This package processes city and country data from a CSV file, fetches geolocatio
 
 ## Usage
 
-To use the package, you can create a script that imports the necessary functions and runs the desired functionality.
+To use the package, you can either create a script or run it directly from the command line.
 
 ### Example Script
 
@@ -67,6 +67,13 @@ Run the script:
 
 ```bash
 python run_generator.py
+```
+
+### Command Line Usage
+You can also run the package directly from the command line:
+
+```bash
+my_maps_generator --template path/to/template.jinja2 --input path/to/input.csv --output path/to/output.kml
 ```
 
 ## Configuration
