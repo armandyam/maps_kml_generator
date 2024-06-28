@@ -24,7 +24,9 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
-        pip install jinja2 geopy
+
+    - name: Set PYTHONPATH
+      run: echo "PYTHONPATH=." >> $GITHUB_ENV
 
     - name: Run tests
       run: |
