@@ -1,7 +1,9 @@
 
 # Maps KML Generator
 
-This package processes city and country data from a CSV file, fetches geolocation coordinates, and generates a KML file using a Jinja2 template. The package can be used as a module and integrates with GitHub Actions for continuous testing.
+[![Python Tests](https://github.com/armandyam/maps_kml_generator/actions/workflows/python-tests.yml/badge.svg)](https://github.com/armandyam/maps_kml_generator/actions/workflows/python-tests.yml)
+
+This package processes city and country data from a CSV file, fetches geolocation coordinates, and generates a KML file using a Jinja2 template. This package can be used to generate a KML file required for uploade in [My Maps](https://www.google.com/maps/). 
 
 
 ![City and Country Map Generator](image_readme.webp)
