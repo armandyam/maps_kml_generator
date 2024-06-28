@@ -8,8 +8,8 @@ from jinja2 import Environment, FileSystemLoader, meta
 from typing import Tuple, Dict, Set, Optional
 import argparse
 
-# Set up logging
-logging.basicConfig(encoding='utf-8', level=logging.DEBUG)
+# Setup logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 
 def load_json_data(filename: str) -> dict:
