@@ -26,7 +26,7 @@ This package processes city and country data from a CSV file, fetches geolocatio
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/yourusername/maps_kml_generator.git
+   git clone https://github.com/armandyam/maps_kml_generator.git
    cd maps_kml_generator
    ```
 
