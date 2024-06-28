@@ -1,0 +1,7 @@
+INFO:root:Vienna, Austria found in DB
+INFO:root:Reading info about Vienna, Austria from file
+INFO:root:Innsbruck, Austria found in DB
+INFO:root:Reading info about Innsbruck, Austria from file
+INFO:root:Getting info about Abu Dhabi, UAE from geopy
+DEBUG:geopy:Nominatim.geocode: https://nominatim.openstreetmap.org/search?q=Abu+Dhabi%2C+UAE&format=json&limit=1
+INFO:root:Processed 3 cities, 2 countries, 2 continents.
