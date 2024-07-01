@@ -178,7 +178,7 @@ def generate_template(template_file: str, input_file: str, output_file: str) -> 
 def main() -> None:
     parser = argparse.ArgumentParser(description='Process data and generate KML file.')
     parser.add_argument('--template', type=str, default='kml_maps.jinja2', help='Jinja2 template file')
-    parser.add_argument('--input', type=str, default='country_city_jk.csv', help='Input CSV file')
+    parser.add_argument('--input', type=str, default='country_city.csv', help='Input CSV file')
     parser.add_argument('--output', type=str, default='map_file_jk.kml', help='Output KML file')
     args = parser.parse_args()
 
