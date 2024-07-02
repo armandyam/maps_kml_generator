@@ -217,3 +217,7 @@ To run the tests, use the following command:
 python -m unittest discover -s tests
 ```
 
+## Contributors
+
+[Jeyashree Krishnan](https://github.com/krishnanj) contributed to this repository.
+
