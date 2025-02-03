@@ -46,12 +46,13 @@ def load_jinja_template(template_file: str) -> Tuple[Environment, Set[str]]:
     undeclared_variables = meta.find_undeclared_variables(parsed_content)
     return template, undeclared_variables
 
-def parse_country_list(file_name: str) -> Dict[str, Dict[str, dict]]:
+def parse_country_list(file_name: str, db_file: str) -> Dict[str, Dict[str, dict]]:
     """
     Read country list from a CSV file and return data structure.
 
     Args:
         file_name (str): Path to the CSV file.
+        db_file (str): Path to the database CSV file.
 
     Returns:
         Dict[str, Dict[str, dict]]: A dictionary with continent data.
@@ -66,7 +67,7 @@ def parse_country_list(file_name: str) -> Dict[str, Dict[str, dict]]:
         next(lines, None)
         for line in lines:
             city, country, continent, notes = map(str.strip, line[:4])
-            lat, lon = get_city_coordinates(city, country, continent)
+            lat, lon = get_city_coordinates(city, country, continent, db_file)
             cities.add(city)
             countries.add(country)
             continents.add(continent)
@@ -81,19 +82,20 @@ def parse_country_list(file_name: str) -> Dict[str, Dict[str, dict]]:
     logging.info(f"Processed {len(cities)} cities, {len(countries)} countries, {len(continents)} continents.")
     return continent_data
 
-def get_coordinates_from_db(city: str, country: str) -> Tuple[Optional[str], Optional[str]]:
+def get_coordinates_from_db(city: str, country: str, db_file: str) -> Tuple[Optional[str], Optional[str]]:
     """
     Get latitude and longitude from the database.
 
     Args:
         city (str): Name of the city.
         country (str): Name of the country.
+        db_file (str): Path to the database CSV file.
 
     Returns:
         Tuple[Optional[str], Optional[str]]: Latitude and longitude if found, otherwise None.
     """
     try:
-        with open('city_country_data_base.csv', 'r') as csvfile:
+        with open(db_file, 'r') as csvfile:
             lines = csv.reader(csvfile)
             for line in lines:
                 if line[0].strip() == city and line[1].strip() == country:
@@ -103,7 +105,7 @@ def get_coordinates_from_db(city: str, country: str) -> Tuple[Optional[str], Opt
         logging.error(f"File not found: {e}")
     return None, None
 
-def add_coordinates_to_db(city: str, country: str, continent: str, lat: float, lon: float) -> None:
+def add_coordinates_to_db(city: str, country: str, continent: str, lat: float, lon: float, db_file: str) -> None:
     """
     Add latitude and longitude to the database.
 
@@ -113,12 +115,13 @@ def add_coordinates_to_db(city: str, country: str, continent: str, lat: float, l
         continent (str): Name of the continent.
         lat (float): Latitude of the city.
         lon (float): Longitude of the city.
+        db_file (str): Path to the database CSV file.
     """
-    with open('city_country_data_base.csv', 'a') as file:
+    with open(db_file, 'a') as file:
         writer = csv.writer(file)
         writer.writerow([city.strip(), country.strip(), continent.strip(), lat, lon])
 
-def get_city_coordinates(city: str, country: str, continent: str) -> Tuple[float, float]:
+def get_city_coordinates(city: str, country: str, continent: str, db_file: str) -> Tuple[float, float]:
     """
     Get latitude and longitude, using cache or geolocation service.
 
@@ -126,11 +129,12 @@ def get_city_coordinates(city: str, country: str, continent: str) -> Tuple[float
         city (str): Name of the city.
         country (str): Name of the country.
         continent (str): Name of the continent.
+        db_file (str): Path to the database CSV file.
 
     Returns:
         Tuple[float, float]: Latitude and longitude of the city.
     """
-    lat, lon = get_coordinates_from_db(city, country)
+    lat, lon = get_coordinates_from_db(city, country, db_file)
     if lat and lon:
         logging.info(f"Reading info about {city}, {country} from file")
         return float(lat), float(lon)
@@ -139,7 +143,7 @@ def get_city_coordinates(city: str, country: str, continent: str) -> Tuple[float
         user_agent = os.getenv('GEOLOCATOR_USER_AGENT', 'default_user_agent')
         geolocator = Nominatim(user_agent=user_agent)
         location = geolocator.geocode(f"{city}, {country}")
-        add_coordinates_to_db(city, country, continent, location.latitude, location.longitude)
+        add_coordinates_to_db(city, country, continent, location.latitude, location.longitude, db_file)
         return location.latitude, location.longitude
 
 def render_template(template_data: dict, template: Environment, output_file: str) -> None:
@@ -160,17 +164,18 @@ def render_template(template_data: dict, template: Environment, output_file: str
         text_file.write(output_text)
 
 
-def generate_template(template_file: str, input_file: str, output_file: str) -> None:
+def generate_kml_map(template_file: str, input_file: str, output_file: str, db_file: str) -> None:
     """
-        Main function to process data and generate output.
+    Generate a KML map file from city data using a template.
 
-        Args:
-            template_file (str): Path to the Jinja2 template file.
-            input_file (str): Path to the input CSV file.
-            output_file (str): Path to the output file.
-        """
+    Args:
+        template_file (str): Path to the Jinja2 template file.
+        input_file (str): Path to the input CSV file.
+        output_file (str): Path to the output file.
+        db_file (str): Path to the database CSV file.
+    """
     template, undeclared_variables = load_jinja_template(template_file)
-    map_data = parse_country_list(input_file)
+    map_data = parse_country_list(input_file, db_file)
     template_data = {"map_data": map_data}
     render_template(template_data, template, output_file)
 
@@ -180,9 +185,10 @@ def main() -> None:
     parser.add_argument('--template', type=str, default='kml_maps.jinja2', help='Jinja2 template file')
     parser.add_argument('--input', type=str, default='country_city.csv', help='Input CSV file')
     parser.add_argument('--output', type=str, default='map_file_jk.kml', help='Output KML file')
+    parser.add_argument('--citydb', type=str, default='city_country_data_base.csv', help='Database CSV file')
     args = parser.parse_args()
 
-    generate_template(args.template, args.input, args.output)
+    generate_kml_map(args.template, args.input, args.output, args.citydb)
 
 if __name__ == '__main__':
     main()
