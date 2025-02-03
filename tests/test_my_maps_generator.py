@@ -10,7 +10,7 @@ from my_maps_generator.my_maps_generator import (
     add_coordinates_to_db,
     get_city_coordinates,
     render_template,
-    generate_template
+    generate_kml_map
 )
 
 class TestMyMapsGenerator(unittest.TestCase):
@@ -116,7 +116,7 @@ class TestMyMapsGenerator(unittest.TestCase):
         output_file = "output.kml"
         mock_load_template.return_value = (MagicMock(), set())
         mock_parse.return_value = {"key": "value"}
-        generate_template(template_file, input_file, output_file)
+        generate_kml_map(template_file, input_file, output_file)
         mock_load_template.assert_called_with(template_file)
         mock_parse.assert_called_with(input_file)
         mock_render.assert_called_with({"map_data": {"key": "value"}}, mock_load_template.return_value[0], output_file)
